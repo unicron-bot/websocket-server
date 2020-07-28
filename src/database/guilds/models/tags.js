@@ -4,17 +4,13 @@ const { Sequelize, DataTypes } = require('sequelize');
  * @param {DataTypes} DataType
  */
 module.exports = (sequelize, DataType) => {
-    return sequelize.define('unicron', {
-        table: {
-            primaryKey: true,
+    return sequelize.define('tags', {
+        guild_id: DataType.STRING,
+        tag_name: {
             type: DataType.STRING,
             unique: true,
         },
-        data: {
-            type: DataType.JSON,
-            allowNull: false,
-            defaultValue: {},
-        }
+        value: DataType.TEXT,
     }, {
         timestamps: false,
     });
