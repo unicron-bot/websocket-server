@@ -1,8 +1,7 @@
-const Server = require('./Server');
 class Command {
     /**
      * 
-     * @param {Server} server
+     * @param {import('./Server')} server
      * @param {string} commandName 
      * @param {{}} options 
      */

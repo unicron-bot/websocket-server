@@ -1,9 +1,8 @@
 const Router = require('express').Router;
-const Server = require('./Server');
 class Route {
     /**
      * 
-     * @param {Server} server 
+     * @param {import('./Server')} server 
      * @param {string} path 
      */
     constructor(server, path) {

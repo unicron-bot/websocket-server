@@ -1,12 +1,12 @@
-const Server = require('./Server');
 const Command = require('./Command');
 const fs = require('fs').promises;
 const path = require('path');
+const readline = require('readline');
 
 class Terminal {
     /**
      * 
-     * @param {Server} server 
+     * @param {import('./Server')} server 
      */
     constructor(server) {
         this.server = server;

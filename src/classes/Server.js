@@ -9,7 +9,9 @@ const io = require('socket.io');
 const Authorization = require('../middlewares/Authorization');
 const Terminal = require('./Terminal');
 const Route = require('./Route');
-const BaseEvent = require('./Event');
+const Database = require('../database/');
+const UserManager = require('../managers/UserManager');
+const GuildManager = require('../managers/GuildManager');
 
 class Server extends EventEmitter {
     constructor() {
@@ -17,7 +19,10 @@ class Server extends EventEmitter {
         this.logger = Logger;
         this.terminal = new Terminal(this);
         this.app = express();
-        this.http = http.createServer(app);
+        this.http = http.createServer(this.app);
+        this.db = Database;
+        this.users = new UserManager(this);
+        this.guilds = new GuildManager(this);
     }
     async registerRoutes() {
         this.app.use(helmet());
@@ -43,21 +48,6 @@ class Server extends EventEmitter {
             res.status(404).json({ message: 'Not found :P', status: 404 });
         });
     }
-    async registerEvents() {
-        const filePath = path.join(__dirname, '..', 'events');
-        const files = await fs.readdir(filePath);
-        for await (const file of files) {
-            if (file.endsWith('.js')) {
-                const Event = require(path.join(filePath, file));
-                if (route.prototype instanceof BaseEvent) {
-                    const instance = new Event(this);
-                    this.logger.info(`Event - ${instance.eventName}`, 'Server');
-                    this.on(instance.eventName, (...args) => instance.emit(...args));
-                }
-                delete require.cache[require.resolve(path.join(filePath, file))];
-            }
-        }
-    }
     websocketInit() {
         this.ws = io(http);
         this.ws.use(Authorization.WebSocket);
@@ -69,7 +59,6 @@ class Server extends EventEmitter {
     async listen(port) {
         this.websocketInit();
         await this.registerRoutes();
-        await this.registerEvents();
         await this.terminal.initiate();
         this.http.listen(port);
     }

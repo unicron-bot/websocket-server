@@ -1,4 +1,3 @@
-const express = require('express');
 const AuthGen = require('../utils/AuthGen');
 /**
  * 
@@ -12,8 +11,8 @@ function WebSocket(socket, next) {
 
 /**
  * 
- * @param {express.request} req 
- * @param {express.response} res 
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
  * @param {function()} next 
  */
 function API(req, res, next) {

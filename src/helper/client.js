@@ -1,11 +1,14 @@
-const Server = require('../classes/Server');
-
 /**
  * 
- * @param {Server} server 
+ * @param {import('../classes/Server')} server 
  * @param {SocketIO.Socket} socket 
  */
-function helper(server, socket) {
-    
+function client(server, socket) {
+    server.logger.info(`Client[${socket.id}] has been connected!`, 'Client');
+    socket.emit('ready');
+    socket.on('ping', () => {
+        socket.emit('pong');
+        server.logger.debug(`${socket.id} pinged!`, 'Client');
+    });
 }
-module.exports = helper;
+module.exports = client;
