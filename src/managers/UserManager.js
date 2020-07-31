@@ -10,7 +10,7 @@ class UserManager extends Manager {
         this.cache = new Map();
     }
     /**
-     * 
+     * @returns {Promise<import('../classes/User')>}
      * @param {string} id
      * @param {boolean} [cache=false]
      * @param {boolean} [force=false]

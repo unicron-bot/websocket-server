@@ -4,7 +4,7 @@
  * @param {SocketIO.Socket} socket 
  */
 function client(server, socket) {
-    server.logger.info(`Client[${socket.id}] has been connected!`, 'Client');
+    server.logger.info(`[${socket.id}] connection establised!`, 'Client');
     socket.emit('ready');
     socket.on('ping', () => {
         socket.emit('pong');

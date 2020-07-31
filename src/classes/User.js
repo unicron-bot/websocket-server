@@ -18,6 +18,11 @@ class User {
         this.raw = raw;
         return this;
     }
+    destroy() {
+        this.server.db.User.deleteOne({ user_id: this.id }, (err) => {
+            if (err) throw err;
+        });
+    }
     /**
      * 
      * @param {{}} options
@@ -31,7 +36,6 @@ class User {
                 });
                 if (typeof this.raw.save !== 'function') throw new Error('oops, save has been changed lellelelele');
                 await this.raw.save().catch((e) => { throw e });
-                this.server.ws.emit('userUpdate', options);
                 resolve(200);
             } catch (e) {
                 reject(e);

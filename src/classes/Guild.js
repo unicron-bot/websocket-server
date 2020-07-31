@@ -18,6 +18,11 @@ class Guild {
         this.raw = raw;
         return this;
     }
+    destroy() {
+        this.server.db.Guild.deleteOne({ guild_id: this.id }, (err) => {
+            if (err) throw err;
+        });
+    }
     /**
      * 
      * @param {{}} options
@@ -31,7 +36,6 @@ class Guild {
                 });
                 if (typeof this.raw.save !== 'function') throw new Error('save has been ajadjaslk');
                 await this.raw.save().catch((e) => { throw e });
-                this.server.ws.emit('guildUpdate', options);
                 resolve({ status: 200 });
             } catch (e) {
                 reject(e);
