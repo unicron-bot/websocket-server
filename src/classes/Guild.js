@@ -3,47 +3,45 @@ class Guild {
      * 
      * @param {import('./Server')} server 
      * @param {string} id
-     * @param {import('mongoose').Document} [data=null]
      */
-    constructor(server, id, data = null) {
+    constructor(server, id) {
         this.server = server;
         this.id = id;
-        this.partial = true;
-        if (data) this.partial = false;
-        this.raw = data;
+        this.raw = null;
     }
-    async fetch(create = false) {
-        let raw = await this.server.db.Guild.findOne({ guild_id: this.id });
-        if (create && !raw) raw = await this.server.db.Guild.create({ guild_id: this.id });
-        this.raw = raw;
-        return this;
+    /**
+     * @returns {Promise<Guild>}
+     */
+    fetch() {
+        return new Promise(async (resolve, reject) => {
+            let raw = await this.server.db.models.Guild.findOne({ where: { id: this.id } }).catch(reject);
+            if (!raw) raw = await this.server.db.models.Guild.create({ id: this.id }).catch(reject);
+            this.raw = raw;
+            resolve(this);
+        });
     }
+    /**
+     * @returns {Promise<void>}
+     */
     destroy() {
-        this.server.db.Guild.deleteOne({ guild_id: this.id }, (err) => {
-            if (err) throw err;
+        return new Promise(async (resolve, reject) => {
+            await this.server.db.models.Guild.destroy({ where: { id: this.id } }).catch(reject);
+            resolve();
         });
     }
     /**
      * 
-     * @param {{}} options
+     * @returns {Promise<Guild>}
+     * @param {{}} partial
      */
-    async update(options) {
+    update(partial) {
         return new Promise(async (resolve, reject) => {
-            try {
-                const keys = Object.keys(options);
-                keys.forEach((key) => {
-                    if (this.raw[key]) this.raw[key] = options[key];
-                });
-                if (typeof this.raw.save !== 'function') throw new Error('save has been ajadjaslk');
-                await this.raw.save().catch((e) => { throw e });
-                resolve({ status: 200 });
-            } catch (e) {
-                reject(e);
-            }
+            await this.server.db.models.Guild.update(partial, { where: { id: this.id } }).catch(reject);
+            resolve(this);
         });
     }
-    get toJSON() { 
-        return this.raw.toJSON();
+    toJSON() {
+        return this.raw ? this.raw.toJSON() : {};
     }
 }
 

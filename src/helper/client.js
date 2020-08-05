@@ -4,11 +4,16 @@
  * @param {SocketIO.Socket} socket 
  */
 function client(server, socket) {
-    server.logger.info(`[${socket.id}] connection establised!`, 'Client');
-    socket.emit('ready');
-    socket.on('ping', () => {
-        socket.emit('pong');
-        server.logger.debug(`${socket.id} pinged!`, 'Client');
+    server.logger.info(`[Client ${socket.id}] connected!`, 'Client');
+    socket.emit('raw', 'ready');
+    socket.on('disconnect', () => {
+        server.logger.info(`[${socket.id}] disconnected`, 'Client');
+    });
+    socket.on('reconnecting', () => {
+        server.logger.info(`[${socket.id}] reconnecting...`, 'Client');
+    });
+    socket.on('error', (err) => {
+        server.logger.error(err, 'Client');
     });
 }
 module.exports = client;

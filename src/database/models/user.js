@@ -1,54 +1,49 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
 
-const inventory = new mongoose.Schema({
-    item_id: {
-        type: String,
-    },
-    amount: {
-        type: Number,
-        default: 0,
-    }
-})
-
-const user = new mongoose.Schema({
-    id: {
-        type: String,
-        unique: true,
-    },
-    data: {
-        type: String,
-        get: (data) => {
-            try {
-                return JSON.parse(data);
-            } catch (err) {
-                return data;
-            }
+/**
+ * 
+ * @param {import('sequelize').Sequelize} sequelize 
+ */
+function user(sequelize) {
+    return sequelize.define('user', {
+        id: {
+            type: DataTypes.STRING,
+            primaryKey: true,
+            unique: true,
         },
-        set: (data) => {
-            return JSON.stringify(data);
+        data: { 
+            type: DataTypes.JSON, 
+            allowNull: false,
+            defaultValue: {},
+        },
+        inventory: {
+            type: DataTypes.JSON,
+            allowNull: false,
+            defaultValue: [],
+        },
+        balance: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        },
+        experience: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        }, 
+        multiplier: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        },
+        marriage_id: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: '',
         }
-    },
-    balance: {
-        type: Number,
-        default: 0,
-    },
-    multiplier: {
-        type: Number,
-        default: 0,
-    },
-    experience: {
-        type: Number,
-        default: 0,
-    },
-    married_id: {
-        type: String,
-        default: '',
-    },
-    multiplier: {
-        type: Number,
-        default: 0,
-    },
-    inventory: [inventory],
-});
+    }, {
+        timestamps: false,
+    })
+}
 
-module.exports = mongoose.model('User', user);
+module.exports = user;

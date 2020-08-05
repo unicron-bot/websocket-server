@@ -2,7 +2,7 @@ const chalk = require('chalk');
 const moment = require('moment');
 
 function timestamp(thread, type) {
-    return `[${moment().format('YYYY-MM-DD HH:mm:ss')}] [${thread} Thread/${type}]`;
+    return `[${moment().format('YYYY-MM-DD HH:mm:ss')}] [${thread} Thread |${type}]`;
 }
 
 module.exports = {
@@ -35,7 +35,7 @@ module.exports = {
      * @param {any} contents 
      * @param {"Server"|"Client"} thread 
      */
-    debug: function (content, thread = 'Server') {
+    debug: function (contents, thread = 'Server') {
         console.log(`${timestamp(thread, chalk.black.bgGreen('DEBUG'))} : ${contents}`);
     }
 }

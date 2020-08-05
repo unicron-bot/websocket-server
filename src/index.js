@@ -1,5 +1,7 @@
 require('dotenv').config();
 const Server = require('./classes/Server');
 const server = new Server();
-server.listen(4201);
 
+(async function() {
+    await server.listen(process.env.PORT || 4201);
+})();

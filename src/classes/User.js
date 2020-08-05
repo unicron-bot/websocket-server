@@ -3,47 +3,47 @@ class User {
      * 
      * @param {import('./Server')} server 
      * @param {string} id
-     * @param {import('mongoose').Document} [data=null]
      */
-    constructor(server, id, data = null) {
+    constructor(server, id) {
         this.server = server;
         this.id = id;
-        this.partial = true;
-        if (data) this.partial = false;
-        this.raw = data;
+        this.raw = null;
     }
-    async fetch(create = false) {
-        let raw = await this.server.db.User.findOne({ user_id: this.id });
-        if (create && !raw) raw = await this.server.db.User.create({ user_id: this.id });
-        this.raw = raw;
-        return this;
+    /**
+     * @returns {Promise<User>}
+     */
+    fetch() {
+        return new Promise(async (resolve, reject) => {
+            let raw = await this.server.db.models.User.findOne({ where: { id: this.id } }).catch(reject);
+            if (!raw) raw = await this.server.db.models.User.create({ id: this.id }).catch(reject);
+            this.raw = raw;
+            resolve(this);
+        })
     }
+    /**
+     * @returns {Promise<void>}
+     */
     destroy() {
-        this.server.db.User.deleteOne({ user_id: this.id }, (err) => {
-            if (err) throw err;
+        return new Promise(async (resolve, reject) => {
+            await this.server.db.models.User.destroy({ where: { id: this.id } }).catch(reject);
+            resolve();
         });
     }
     /**
-     * 
-     * @param {{}} options
+     * @returns {Promise<User>}
+     * @param {{}} partial
      */
-    async update(options) {
+    update(partial) {
         return new Promise(async (resolve, reject) => {
-            try {
-                const keys = Object.keys(options);
-                keys.forEach((key) => {
-                    if (this.raw[key]) this.raw[key] = options[key];
-                });
-                if (typeof this.raw.save !== 'function') throw new Error('oops, save has been changed lellelelele');
-                await this.raw.save().catch((e) => { throw e });
-                resolve(200);
-            } catch (e) {
-                reject(e);
-            }
+            await this.server.db.models.User.update(partial, { where: { id: this.id } }).catch(reject);
+            resolve(this);
         });
     }
-    get toJSON() { 
-        return this.raw.toJSON();
+    /**
+     * @returns {{}}
+     */
+    toJSON() {
+        return this.raw ? this.raw.toJSON() : {};
     }
 }
 

@@ -1,11 +1,12 @@
 {
-  "name": "database-api",
+  "name": "websocket-database",
   "version": "0.0.1",
-  "description": "WebSocket Server API",
+  "description": "WebSocket Database for Unicron",
   "main": "src/index.js",
   "scripts": {
     "start": "node .",
-    "dev": "nodemon src/index.js -e js"
+    "dbInit": "node src/database/index.js --dbInit",
+    "dev": "nodemon src/index.js"
   },
   "keywords": [
     "database",

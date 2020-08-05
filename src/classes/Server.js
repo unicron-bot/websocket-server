@@ -6,27 +6,72 @@ const fs = require('fs').promises;
 const path = require('path');
 const http = require('http');
 const io = require('socket.io');
-const Authorization = require('../middlewares/Authorization');
-const Terminal = require('./Terminal');
 const Route = require('./Route');
 const Database = require('../database/');
-const UserManager = require('../managers/UserManager');
-const GuildManager = require('../managers/GuildManager');
+
+const User = require('./User');
+const Guild = require('./Guild');
+const GuildMember = require('./Member');
+const GuildTag = require('./Tag');
 
 class Server extends EventEmitter {
     constructor() {
         super();
         this.logger = Logger;
-        this.terminal = new Terminal(this);
         this.app = express();
-        this.http = http.createServer(this.app);
         this.db = Database;
-        this.users = new UserManager(this);
-        this.guilds = new GuildManager(this);
+        this.managers = {
+            /**
+             * @returns {Promise<User>}
+             * @param {string} id
+             */
+            user: (id) => {
+                return new Promise(async (resolve, reject) => {
+                    const user = new User(this, id);
+                    await user.fetch().catch(reject);
+                    resolve(user);
+                });
+            },
+            /**
+             * @returns {Promise<Guild>}
+             * @param {string} id
+             */
+            guild: (id) => {
+                return new Promise(async (resolve, reject) => {
+                    const guild = new Guild(this, id);
+                    await guild.fetch().catch(reject);
+                    resolve(guild);
+                });
+            },
+            /**
+             * @returns {Promise<GuildMember>}
+             * @param {string} guild_id
+             * @param {string} guild_id
+             */
+            member: (guild_id, member_id) => {
+                return new Promise(async (resolve, reject) => {
+                    const member = new GuildMember(this, { guild_id, member_id });
+                    await member.fetch().catch(reject);
+                    resolve(member);
+                });
+            },
+            /**
+             * @returns {Promise<GuildTag>}
+             * @param {string} guild_id
+             * @param {string} tag_name
+             * @param {boolean} createIfNotExist
+             */
+            tag: (guild_id, tag_name, createIfNotExist) => {
+                return new Promise(async (resolve, reject) => {
+                    const tag = new GuildTag(this, { guild_id, tag_name });
+                    await tag.fetch(createIfNotExist).catch(reject);
+                    resolve(tag);
+                });
+            }
+        }
     }
     async registerRoutes() {
         this.app.use(helmet());
-        this.app.use(Authorization.API);
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         this.app.get('/', (req, res) => {
@@ -39,7 +84,7 @@ class Server extends EventEmitter {
                 const route = require(path.join(filePath, file));
                 if (route.prototype instanceof Route) {
                     const instance = new route(this);
-                    this.logger.info(`Route - ${instance.path}`, 'Server');
+                    this.logger.info(`Route ${instance.path}`, 'Server');
                     this.app.use(instance.path, instance.createRoute());
                 }
             }
@@ -49,18 +94,18 @@ class Server extends EventEmitter {
         });
     }
     websocketInit() {
-        this.ws = io(http);
-        this.ws.use(Authorization.WebSocket);
+        this.http = http.createServer(this.app);
+        this.ws = io(this.http);
         this.ws.on('connection', (socket) => {
-            this.logger.info(`[Client ${socket.id}] connected!`, 'Client');
             require('../helper/client')(this, socket);
         });
     }
     async listen(port) {
         this.websocketInit();
         await this.registerRoutes();
-        await this.terminal.initiate();
-        this.http.listen(port);
+        this.http.listen(port, () => {
+            this.logger.info(`WebSocket Database Running on PORT ${port}`);
+        });
     }
 }
 

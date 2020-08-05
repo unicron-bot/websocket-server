@@ -1,4 +1,3 @@
-
 const Route = require('../classes/Route');
 
 class User extends Route {
@@ -7,36 +6,42 @@ class User extends Route {
     }
 
     createRoute() {
-        this.router.get('/:id', (req, res) => {
+        this.router.get('/:id', async (req, res) => {
             try {
                 const id = req.params.id;
-                const user = await this.server.users.fetch(id, true, true);
+                if (!id) throw { status: 400, message: 'Parameter ID not provided' };
+                const user = await this.server.managers.user(id).catch((e) => { throw e; });
+                this.server.ws.local.emit('raw', 'userUpdate', user.toJSON());
                 res.status(200).send(user.toJSON());
             } catch (e) {
-                res.status(400).json(e);
+                res.status(400).send(e);
             }
         });
-        this.router.post('/:id', (req, res) => {
+        this.router.post('/:id', async (req, res) => {
             try {
                 const id = req.params.id;
-                const user = await this.server.users.fetch(id, true, true);
-                await user.update(req.body).catch((e) => { throw e; });
-                res.status(200).json(user.toJSON());
-                this.server.ws.emit('userUpdate', user.toJSON());
+                const partial = req.body;
+                if (!id) throw { status: 400, message: 'Parameter ID not provided' };
+                if (!partial || typeof partial !== 'object') throw { status: 400, message: 'Invalid Body' };
+                const user = await this.server.managers.user(id, true).catch((e) => { throw e; });
+                await user.update(partial).catch((e) => { throw e; });
+                await user.fetch().catch((e) => { throw e; });
+                this.server.ws.local.emit('raw', 'userUpdate', user.toJSON());
+                res.status(200).send(user.toJSON());
             } catch (e) {
-                res.status(400).json(e);
+                res.status(400).send(e);
             }
         });
-        this.router.delete('/:id', (req, res) => {
+        this.router.delete('/:id', async (req, res) => {
             try {
                 const id = req.params.id;
-                const user = await this.server.users.fetch(id);
-                user.destroy();
-                if (this.server.users.cache.has(id)) this.server.users.cache.delete(id);
-                res.status(200).json('done');
-                this.server.ws.emit('userDelete', id);
+                if (!id) throw { status: 400, message: 'Parameter ID not provided'};
+                const user = await this.server.managers.user(id).catch((e) => { throw e; });
+                await user.destroy().catch((e) => { throw e; });
+                this.server.ws.local.emit('raw', 'userDelete', id);
+                res.status(200).send({ status: 200, message: 'User Deleted from the database!'});
             } catch (e) {
-                res.status(400).json(e);
+                res.status(400).send(e);
             }
         });
         return this.router;
