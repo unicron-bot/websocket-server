@@ -95,7 +95,9 @@ class Server extends EventEmitter {
     }
     websocketInit() {
         this.http = http.createServer(this.app);
-        this.ws = io(this.http);
+        this.ws = io(this.http, {
+            transports: ['websocket'],
+        });
         this.ws.on('connection', (socket) => {
             require('../helper/client')(this, socket);
         });

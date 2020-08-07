@@ -1,6 +1,9 @@
-
 # WebSocket API Database Server
 
+## License
+See [LICENSE](LICENSE)
+
+# Documentation
 
 ## Reference
 
