@@ -10,11 +10,10 @@ const db = new Sequelize('database', 'username', 'password', {
     retry: { max: 10 },
 });
 
-const { guild, tag, member } = require('./models/guild');
+const { guild, member } = require('./models/guild');
 
 const User = require('./models/user')(db);
 const Guild = guild(db);
-const GuildTag = tag(db);
 const GuildMember = member(db);
 
 (async function () {
@@ -32,6 +31,6 @@ const GuildMember = member(db);
 module.exports = {
     db,
     models: {
-        User, Guild, GuildTag, GuildMember
+        User, Guild, GuildMember
     }
 }

@@ -4,24 +4,6 @@ const { DataTypes } = require('sequelize');
  * 
  * @param {import('sequelize').Sequelize} sequelize 
  */
-function tag(sequelize) {
-    return sequelize.define('guild_tag', {
-        guild_id: DataTypes.STRING,
-        tag_name: DataTypes.STRING,
-        data: {
-            type: DataTypes.JSON,
-            allowNull: false,
-            defaultValue: {},
-        }
-    }, {
-        timestamps: false,
-    })
-}
-
-/**
- * 
- * @param {import('sequelize').Sequelize} sequelize 
- */
 function member(sequelize) {
     return sequelize.define('guild_member', {
         guild_id: DataTypes.STRING,
@@ -193,7 +175,6 @@ function guild(sequelize) {
 }
 
 module.exports = {
-    tag,
     member,
     guild,
 }

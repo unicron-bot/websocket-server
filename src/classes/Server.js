@@ -1,18 +1,17 @@
 const { EventEmitter } = require('events');
 const Logger = require('../utils/Logger');
 const express = require('express');
-const helmet = require('helmet');
 const fs = require('fs').promises;
 const path = require('path');
 const http = require('http');
 const io = require('socket.io');
+const cors = require('cors');
+const helmet = require('helmet');
 const Route = require('./Route');
 const Database = require('../database/');
-
 const User = require('./User');
 const Guild = require('./Guild');
 const GuildMember = require('./Member');
-const GuildTag = require('./Tag');
 
 class Server extends EventEmitter {
     constructor() {
@@ -55,25 +54,17 @@ class Server extends EventEmitter {
                     resolve(member);
                 });
             },
-            /**
-             * @returns {Promise<GuildTag>}
-             * @param {string} guild_id
-             * @param {string} tag_name
-             * @param {boolean} createIfNotExist
-             */
-            tag: (guild_id, tag_name, createIfNotExist) => {
-                return new Promise(async (resolve, reject) => {
-                    const tag = new GuildTag(this, { guild_id, tag_name });
-                    await tag.fetch(createIfNotExist).catch(reject);
-                    resolve(tag);
-                });
-            }
         }
     }
     async registerRoutes() {
+        this.app.use(cors());
         this.app.use(helmet());
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
+        this.app.use((req, res, next) => {
+            this.logger.info(`${req.ip.replace('::ffff:', '')} ${req.method} ${req.path}`, 'Client');
+            next();
+        });
         this.app.get('/', (req, res) => {
             res.status(200).json({ message: 'Hello World', status: 200 });
         });
@@ -95,9 +86,7 @@ class Server extends EventEmitter {
     }
     websocketInit() {
         this.http = http.createServer(this.app);
-        this.ws = io(this.http, {
-            transports: ['websocket'],
-        });
+        this.ws = io(this.http);
         this.ws.on('connection', (socket) => {
             require('../helper/client')(this, socket);
         });

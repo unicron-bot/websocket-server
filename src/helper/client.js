@@ -9,9 +9,6 @@ function client(server, socket) {
     socket.on('disconnect', () => {
         server.logger.info(`[${socket.id}] disconnected`, 'Client');
     });
-    socket.on('reconnecting', () => {
-        server.logger.info(`[${socket.id}] reconnecting...`, 'Client');
-    });
     socket.on('error', (err) => {
         server.logger.error(err, 'Client');
     });
