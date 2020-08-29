@@ -84,7 +84,14 @@ class Server extends EventEmitter {
         this.http = http.createServer(this.app);
         this.ws = io(this.http);
         this.ws.on('connection', (socket) => {
-            require('../helper/client')(this, socket);
+            this.logger.info(`[Client ${socket.id}] connected!`, 'Client');
+            socket.emit('raw', 'ready');
+            socket.on('disconnect', () => {
+                this.logger.info(`[${socket.id}] disconnected`, 'Client');
+            });
+            socket.on('error', (err) => {
+                this.logger.error(err, 'Client');
+            });
         });
     }
     async listen(port) {
