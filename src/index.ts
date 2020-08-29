@@ -1,5 +1,5 @@
 require('dotenv').config();
-const Server = require('./classes/Server');
+import Server = require('./classes/Server');
 const server = new Server();
 
 (async function() {

@@ -1,16 +1,16 @@
 const Route = require('../classes/Route');
 
 class Members extends Route {
-    constructor(server) {
+    constructor(server: any) {
         super(server, '/api/members');
     }
     createRoute() {
-        this.router.get('/:guild_id', async (req, res) => {
+        this.router.get('/:guild_id', async (req: { params: { guild_id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: any): void; new(): any; }; }; }) => {
             try {
                 const guild_id = req.params.guild_id;
                 if (!guild_id) throw { status: 400, message: 'Missing Parameters' };
-                const members = await this.server.db.models.GuildMember.findAll({ where: { guild_id } }).catch((e) => { throw e; });
-                res.status(200).send(members.map((m) => {
+                const members = await this.server.db.models.GuildMember.findAll({ where: { guild_id } }).catch((e: any) => { throw e; });
+                res.status(200).send(members.map((m: { toJSON: () => { member_id: any; data: any; }; }) => {
                     const { member_id, data } = m.toJSON();
                     return { member_id, data };
                 }));
@@ -18,11 +18,11 @@ class Members extends Route {
                 res.status(400).send(e);
             }
         });
-        this.router.delete('/:guild_id', async (req, res) => {
+        this.router.delete('/:guild_id', async (req: { params: { guild_id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: { status: number; message: string; }): void; new(): any; }; }; }) => {
             try {
                 const guild_id = req.params.guild_id;
                 if (!guild_id) throw { status: 400, message: 'Missing Parameters'};
-                const count = await this.server.db.models.GuildMember.destroy({ where: { guild_id }}).catch((e) => { throw e; });
+                const count = await this.server.db.models.GuildMember.destroy({ where: { guild_id }}).catch((e: any) => { throw e; });
                 this.server.ws.local.emit('raw', 'memberDeletion', guild_id);
                 res.status(200).send({ status: 200, message: `Deleted ${count} member(s) datas from ${guild_id}`});
             } catch (e) {

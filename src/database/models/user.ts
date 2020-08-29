@@ -4,7 +4,7 @@ const { DataTypes } = require('sequelize');
  * 
  * @param {import('sequelize').Sequelize} sequelize 
  */
-function user(sequelize) {
+function user(sequelize: import('sequelize').Sequelize) {
     return sequelize.define('user', {
         id: {
             type: DataTypes.STRING,

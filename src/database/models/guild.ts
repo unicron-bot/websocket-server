@@ -4,7 +4,7 @@ const { DataTypes } = require('sequelize');
  * 
  * @param {import('sequelize').Sequelize} sequelize 
  */
-function member(sequelize) {
+function member(sequelize: import('sequelize').Sequelize) {
     return sequelize.define('guild_member', {
         guild_id: DataTypes.STRING,
         member_id: DataTypes.STRING,
@@ -22,7 +22,7 @@ function member(sequelize) {
  * 
  * @param {import('sequelize').Sequelize} sequelize 
  */
-function guild(sequelize) {
+function guild(sequelize: import('sequelize').Sequelize) {
     return sequelize.define('guild', {
         id: {
             type: DataTypes.STRING,

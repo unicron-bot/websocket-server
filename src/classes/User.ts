@@ -1,10 +1,13 @@
 class User {
+    server: import('./Server');
+    id: string;
+    raw: any;
     /**
      * 
      * @param {import('./Server')} server 
      * @param {string} id
      */
-    constructor(server, id) {
+    constructor(server: import('./Server'), id: string) {
         this.server = server;
         this.id = id;
         this.raw = null;
@@ -12,7 +15,7 @@ class User {
     /**
      * @returns {Promise<User>}
      */
-    fetch() {
+    fetch(): Promise<this> {
         return new Promise(async (resolve, reject) => {
             let raw = await this.server.db.models.User.findOne({ where: { id: this.id } }).catch(reject);
             if (!raw) raw = await this.server.db.models.User.create({ id: this.id }).catch(reject);
@@ -23,7 +26,7 @@ class User {
     /**
      * @returns {Promise<void>}
      */
-    destroy() {
+    destroy(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             await this.server.db.models.User.destroy({ where: { id: this.id } }).catch(reject);
             resolve();
@@ -33,7 +36,7 @@ class User {
      * @returns {Promise<User>}
      * @param {{}} partial
      */
-    update(partial) {
+    update(partial: {}): Promise<this> {
         return new Promise(async (resolve, reject) => {
             await this.server.db.models.User.update(partial, { where: { id: this.id } }).catch(reject);
             resolve(this);
@@ -42,7 +45,7 @@ class User {
     /**
      * @returns {{}}
      */
-    toJSON() {
+    toJSON(): {} {
         return this.raw ? this.raw.toJSON() : {};
     }
 }

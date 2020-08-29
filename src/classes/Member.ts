@@ -1,12 +1,15 @@
 class GuildMember {
+    private server: import('./Server');
+    private raw: any;
+    public id: {};
     /**
      * 
      * @param {import('./Server')} server 
-     * @param {object} id
+     * @param {{}} id
      * @param {string} id.member_id
      * @param {string} id.guild_id
      */
-    constructor(server, id) {
+    constructor(server: import('./Server'), id: {}) {
         this.server = server;
         this.raw = null;
         this.id = id;
@@ -14,7 +17,7 @@ class GuildMember {
     /**
      * @returns {Promise<GuildMember>}
      */
-    fetch() {
+    fetch(): Promise<this> {
         return new Promise(async (resolve, reject) => {
             let raw = await this.server.db.models.GuildMember.findOne({ where: this.id }).catch(reject);
             if (!raw) raw = await this.server.db.models.GuildMember.create(this.id).catch(reject);
@@ -25,7 +28,7 @@ class GuildMember {
     /**
      * @returns {Promise<void>}
      */
-    destroy() {
+    destroy(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             await this.server.db.models.GuildMember.destroy({ where: this.id }).catch(reject);
             resolve();
@@ -35,7 +38,7 @@ class GuildMember {
      * @returns {Promise<GuildMember>}
      * @param {{}} payload
      */
-    update(payload) {
+    update(payload: {}): Promise<this> {
         return new Promise(async (resolve, reject) => {
             await this.server.db.models.GuildMember.update(payload, { where: this.id }).catch(reject);
             resolve(this);
@@ -44,7 +47,7 @@ class GuildMember {
     /**
      * @returns {{}}
      */
-    toJSON() {
+    toJSON(): {} {
         const { guild_id, member_id, data } = this.raw.toJSON();
         return guild_id && member_id ? { guild_id, member: { id: member_id, data } } : {};
     }
