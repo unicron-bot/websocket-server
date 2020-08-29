@@ -2,12 +2,11 @@
   "name": "websocket-database",
   "version": "0.0.1",
   "description": "WebSocket Database for Unicron",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "node .",
-    "dbInit": "node dist/database/index.js --dbInit",
-    "dev": "nodemon dist/index.js",
-    "build": "tsc --build"
+    "dbInit": "node src/database/index.js --dbInit",
+    "dev": "nodemon src/index.js"
   },
   "keywords": [
     "database",
