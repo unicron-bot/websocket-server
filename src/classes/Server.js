@@ -5,8 +5,6 @@ const fs = require('fs').promises;
 const path = require('path');
 const http = require('http');
 const io = require('socket.io');
-const cors = require('cors');
-const helmet = require('helmet');
 const Route = require('./Route');
 const Database = require('../database/');
 const User = require('./User');
@@ -57,8 +55,6 @@ class Server extends EventEmitter {
         }
     }
     async registerRoutes() {
-        this.app.use(cors());
-        this.app.use(helmet());
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use((req, res, next) => {
