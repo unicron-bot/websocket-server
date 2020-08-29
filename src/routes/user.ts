@@ -1,12 +1,12 @@
-const Route = require('../classes/Route');
+import Route from '../classes/Route';
+import Server from '../classes/Server';
 
-class User extends Route {
-    constructor(server: any) {
+export default class User extends Route {
+    constructor(server: Server) {
         super(server, '/api/user');
     }
-
     createRoute() {
-        this.router.get('/:id', async (req: { params: { id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: any): void; new(): any; }; }; }) => {
+        this.router.get('/:id', async (req, res) => {
             try {
                 const id = req.params.id;
                 if (!id) throw { status: 400, message: 'Parameter ID not provided' };
@@ -17,13 +17,13 @@ class User extends Route {
                 res.status(400).send(e);
             }
         });
-        this.router.post('/:id', async (req: { params: { id: any; }; body: any; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: any): void; new(): any; }; }; }) => {
+        this.router.post('/:id', async (req, res) => {
             try {
                 const id = req.params.id;
                 const partial = req.body;
                 if (!id) throw { status: 400, message: 'Parameter ID not provided' };
                 if (!partial || typeof partial !== 'object') throw { status: 400, message: 'Invalid Body' };
-                const user = await this.server.managers.user(id, true).catch((e: any) => { throw e; });
+                const user = await this.server.managers.user(id).catch((e: any) => { throw e; });
                 await user.update(partial).catch((e: any) => { throw e; });
                 await user.fetch().catch((e: any) => { throw e; });
                 this.server.ws.local.emit('raw', 'userUpdate', user.toJSON());
@@ -32,14 +32,14 @@ class User extends Route {
                 res.status(400).send(e);
             }
         });
-        this.router.delete('/:id', async (req: { params: { id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: { status: number; message: string; }): void; new(): any; }; }; }) => {
+        this.router.delete('/:id', async (req, res) => {
             try {
                 const id = req.params.id;
-                if (!id) throw { status: 400, message: 'Parameter ID not provided'};
+                if (!id) throw { status: 400, message: 'Parameter ID not provided' };
                 const user = await this.server.managers.user(id).catch((e: any) => { throw e; });
                 await user.destroy().catch((e: any) => { throw e; });
                 this.server.ws.local.emit('raw', 'userDelete', id);
-                res.status(200).send({ status: 200, message: 'User Deleted from the database!'});
+                res.status(200).send({ status: 200, message: 'User Deleted from the database!' });
             } catch (e) {
                 res.status(400).send(e);
             }
@@ -47,5 +47,3 @@ class User extends Route {
         return this.router;
     }
 }
-
-module.exports = User;

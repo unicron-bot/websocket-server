@@ -1,13 +1,15 @@
-class Guild {
+import Server from './Server';
+
+export default class Guild {
     public id: string;
-    private server: import('./Server');
+    private server: Server;
     private raw: any;
     /**
      * 
      * @param {import('./Server')} server 
      * @param {string} id
      */
-    constructor(server: import('./Server'), id: string) {
+    constructor(server: Server, id: string) {
         this.server = server;
         this.id = id;
         this.raw = null;
@@ -15,7 +17,7 @@ class Guild {
     /**
      * @returns {Promise<Guild>}
      */
-    fetch(): Promise<this> {
+    fetch(): Promise<Guild> {
         return new Promise(async (resolve, reject) => {
             let raw = await this.server.db.models.Guild.findOne({ where: { id: this.id } }).catch(reject);
             if (!raw) raw = await this.server.db.models.Guild.create({ id: this.id }).catch(reject);
@@ -37,7 +39,7 @@ class Guild {
      * @returns {Promise<Guild>}
      * @param {{}} partial
      */
-    update(partial: {}): Promise<this> {
+    update(partial: {}): Promise<Guild> {
         return new Promise(async (resolve, reject) => {
             await this.server.db.models.Guild.update(partial, { where: { id: this.id } }).catch(reject);
             resolve(this);
@@ -47,5 +49,3 @@ class Guild {
         return this.raw ? this.raw.toJSON() : {};
     }
 }
-
-module.exports = Guild;

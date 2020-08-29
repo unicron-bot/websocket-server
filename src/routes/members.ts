@@ -1,16 +1,17 @@
-const Route = require('../classes/Route');
+import Route from '../classes/Route';
+import Server from '../classes/Server';
 
-class Members extends Route {
-    constructor(server: any) {
+export default class Members extends Route {
+    constructor(server: Server) {
         super(server, '/api/members');
     }
     createRoute() {
-        this.router.get('/:guild_id', async (req: { params: { guild_id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: any): void; new(): any; }; }; }) => {
+        this.router.get('/:guild_id', async (req, res) => {
             try {
                 const guild_id = req.params.guild_id;
                 if (!guild_id) throw { status: 400, message: 'Missing Parameters' };
                 const members = await this.server.db.models.GuildMember.findAll({ where: { guild_id } }).catch((e: any) => { throw e; });
-                res.status(200).send(members.map((m: { toJSON: () => { member_id: any; data: any; }; }) => {
+                res.status(200).send(members.map((m: any) => {
                     const { member_id, data } = m.toJSON();
                     return { member_id, data };
                 }));
@@ -18,7 +19,7 @@ class Members extends Route {
                 res.status(400).send(e);
             }
         });
-        this.router.delete('/:guild_id', async (req: { params: { guild_id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: { status: number; message: string; }): void; new(): any; }; }; }) => {
+        this.router.delete('/:guild_id', async (req, res) => {
             try {
                 const guild_id = req.params.guild_id;
                 if (!guild_id) throw { status: 400, message: 'Missing Parameters'};
@@ -32,5 +33,3 @@ class Members extends Route {
         return this.router;
     }
 }
-
-module.exports = Members;

@@ -1,11 +1,7 @@
-class Manager {
-    protected server: import('./Server');
-    /**
-     * @param {import('./Server')} server
-     */
-    constructor(server: import('./Server')) {
+import Server from './Server';
+export default class Manager {
+    protected server: Server;
+    constructor(server: Server) {
         this.server = server;
     }
 }
-
-module.exports = Manager;

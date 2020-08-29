@@ -1,20 +1,21 @@
-const { Sequelize } = require('sequelize');
-const Logger = require('../utils/Logger');
+import { Sequelize, Transaction } from 'sequelize';
+import Logger from '../utils/Logger';
 
 const db = new Sequelize('database', 'username', 'password', {
     host: 'localhost',
     dialect: 'sqlite',
     logging: false,
     storage: './database/db.sqlite',
-    transactionType: 'IMMEDIATE',
+    transactionType: Transaction.TYPES.IMMEDIATE,
     retry: { max: 10 },
 });
 
-const { guild, member } = require('./models/guild');
+import g from './models/guild';
+import user from './models/user';
 
-const User = require('./models/user')(db);
-const Guild = guild(db);
-const GuildMember = member(db);
+const User = user(db);
+const Guild = g.guild(db);
+const GuildMember = g.member(db);
 
 (async function () {
     if (process.argv.includes('--dbInit')) {
@@ -28,7 +29,7 @@ const GuildMember = member(db);
     });
 })();
 
-module.exports = {
+export default {
     db,
     models: {
         User, Guild, GuildMember

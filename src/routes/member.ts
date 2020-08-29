@@ -1,11 +1,12 @@
-const Route = require('../classes/Route');
+import Route from '../classes/Route';
+import Server from '../classes/Server';
 
-class Member extends Route {
-    constructor(server: any) {
+export default class Member extends Route {
+    constructor(server: Server) {
         super(server, '/api/member');
     }
     createRoute() {
-        this.router.get('/:guild_id/:member_id', async (req: { params: { guild_id: any; member_id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: any): void; new(): any; }; }; }) => {
+        this.router.get('/:guild_id/:member_id', async (req, res) => {
             try {
                 const guild_id = req.params.guild_id;
                 const member_id = req.params.member_id;
@@ -16,7 +17,7 @@ class Member extends Route {
                 res.status(400).send(e);
             }
         });
-        this.router.post('/:guild_id/:member_id', async (req: { params: { guild_id: any; member_id: any; }; body: any; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: any): void; new(): any; }; }; }) => {
+        this.router.post('/:guild_id/:member_id', async (req, res) => {
             try {
                 const guild_id = req.params.guild_id;
                 const member_id = req.params.member_id;
@@ -31,7 +32,7 @@ class Member extends Route {
                 res.status(400).send(e);
             }
         });
-        this.router.delete('/:guild_id/:member_id', async (req: { params: { guild_id: any; member_id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; send: { (arg0: { status: number; message: string; }): void; new(): any; }; }; }) => {
+        this.router.delete('/:guild_id/:member_id', async (req, res) => {
             try {
                 const guild_id = req.params.guild_id;
                 const member_id = req.params.member_id;
@@ -46,5 +47,3 @@ class Member extends Route {
         return this.router;
     }
 }
-
-module.exports = Member;

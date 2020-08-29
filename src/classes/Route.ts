@@ -1,14 +1,11 @@
-const Router = require('express').Router;
-class Route {
-    server: import('./Server');
-    router: import('express').Router;
+import Server from './Server';
+import { Router } from 'express';
+
+export default class Route {
+    server: Server;
+    router: Router;
     path: string;
-    /**
-     * 
-     * @param {import('./Server')} server 
-     * @param {string} path 
-     */
-    constructor(server: import('./Server'), path: string) {
+    constructor(server: Server, path: string) {
         this.path = path;
         this.server = server;
         this.router = Router();
@@ -17,5 +14,3 @@ class Route {
         return this.router;
     }
 }
-
-module.exports = Route;

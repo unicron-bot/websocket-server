@@ -1,10 +1,6 @@
-const { DataTypes } = require('sequelize');
+import { Sequelize, DataTypes } from 'sequelize';
 
-/**
- * 
- * @param {import('sequelize').Sequelize} sequelize 
- */
-function user(sequelize: import('sequelize').Sequelize) {
+export default function user(sequelize: Sequelize) {
     return sequelize.define('user', {
         id: {
             type: DataTypes.STRING,
@@ -43,7 +39,5 @@ function user(sequelize: import('sequelize').Sequelize) {
         }
     }, {
         timestamps: false,
-    })
+    });
 }
-
-module.exports = user;

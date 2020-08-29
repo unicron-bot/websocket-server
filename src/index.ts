@@ -1,7 +1,7 @@
-require('dotenv').config();
-import Server = require('./classes/Server');
+import Server from './classes/Server';
+
 const server = new Server();
 
 (async function() {
-    await server.listen(process.env.PORT || 4201);
+    await server.listen(4201);
 })();

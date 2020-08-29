@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "esnext",
+    "target": "es5",
     "noImplicitAny": true,
     "sourceMap": false,
     "pretty": true,
     "outDir": "./dist",
     "declaration": false,
+    "esModuleInterop": true,
   },
   "exclude": [
     "node_modules"
