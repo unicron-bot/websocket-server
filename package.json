@@ -1,6 +1,6 @@
 {
   "name": "websocket-database",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "WebSocket Database for Unicron",
   "main": "dist/index.js",
   "scripts": {
