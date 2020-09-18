@@ -11,9 +11,9 @@ export default class Guild extends Route {
                 const id = req.params.id;
                 if (!id)
                     throw { status: 400, message: 'Parameter ID not provided' };
-                const guild = await this.server.managers.guild(id).catch((e) => { throw e; });
+                const guild = await this.server.managers.guild(id);
                 this.server.ws.local.emit('raw', 'guildUpdate', guild.toJSON());
-                res.status(200).json(guild.toJSON());
+                res.sendStatus(200);
             }
             catch (e) {
                 res.status(400).send(e);
@@ -27,11 +27,11 @@ export default class Guild extends Route {
                     throw { status: 400, message: 'Missing Parameter' };
                 if (!partial || typeof partial !== 'object')
                     throw { status: 400, message: 'Invalid Body' };
-                const guild = await this.server.managers.guild(id).catch((e) => { throw e; });
-                await guild.update(partial).catch((e) => { throw e; });
-                await guild.fetch().catch((e) => { throw e; });
+                const guild = await this.server.managers.guild(id);
+                await guild.update(partial);
+                await guild.fetch();
                 this.server.ws.local.emit('raw', 'guildUpdate', guild.toJSON());
-                res.status(200).json(guild.toJSON());
+                res.sendStatus(200);
             }
             catch (e) {
                 res.status(400).send(e);
@@ -42,10 +42,10 @@ export default class Guild extends Route {
                 const id = req.params.id;
                 if (!id)
                     throw { status: 400, message: 'Missing Parameter' };
-                const guild = await this.server.managers.guild(id).catch((e) => { throw e; });
-                await guild.destroy().catch((e) => { throw e; });
+                const guild = await this.server.managers.guild(id);
+                await guild.destroy();
                 this.server.ws.local.emit('raw', 'guildDelete', id);
-                res.status(200).send({ status: 200, message: 'Guild Deleted from the database!' });
+                res.sendStatus(200);
             }
             catch (e) {
                 res.status(400).send(e);

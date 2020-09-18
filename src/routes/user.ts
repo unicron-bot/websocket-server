@@ -10,9 +10,9 @@ export default class User extends Route {
             try {
                 const id = req.params.id;
                 if (!id) throw { status: 400, message: 'Parameter ID not provided' };
-                const user = await this.server.managers.user(id).catch((e: any) => { throw e; });
+                const user = await this.server.managers.user(id);
                 this.server.ws.local.emit('raw', 'userUpdate', user.toJSON());
-                res.status(200).send(user.toJSON());
+                res.sendStatus(200);
             } catch (e) {
                 res.status(400).send(e);
             }
@@ -23,11 +23,11 @@ export default class User extends Route {
                 const partial = req.body;
                 if (!id) throw { status: 400, message: 'Parameter ID not provided' };
                 if (!partial || typeof partial !== 'object') throw { status: 400, message: 'Invalid Body' };
-                const user = await this.server.managers.user(id).catch((e: any) => { throw e; });
-                await user.update(partial).catch((e: any) => { throw e; });
-                await user.fetch().catch((e: any) => { throw e; });
+                const user = await this.server.managers.user(id);
+                await user.update(partial);
+                await user.fetch();
                 this.server.ws.local.emit('raw', 'userUpdate', user.toJSON());
-                res.status(200).send(user.toJSON());
+                res.sendStatus(200);
             } catch (e) {
                 res.status(400).send(e);
             }
@@ -36,10 +36,10 @@ export default class User extends Route {
             try {
                 const id = req.params.id;
                 if (!id) throw { status: 400, message: 'Parameter ID not provided' };
-                const user = await this.server.managers.user(id).catch((e: any) => { throw e; });
-                await user.destroy().catch((e: any) => { throw e; });
+                const user = await this.server.managers.user(id);
+                await user.destroy();
                 this.server.ws.local.emit('raw', 'userDelete', id);
-                res.status(200).send({ status: 200, message: 'User Deleted from the database!' });
+                res.sendStatus(200);
             } catch (e) {
                 res.status(400).send(e);
             }

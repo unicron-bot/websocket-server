@@ -10,9 +10,9 @@ export default class Member extends Route {
             try {
                 const guild_id = req.params.guild_id;
                 const member_id = req.params.member_id;
-                const member = await this.server.managers.member(guild_id, member_id).catch((e: any) => { throw e; });
+                const member = await this.server.managers.member(guild_id, member_id);
                 this.server.ws.local.emit('raw', 'memberUpdate', member.toJSON());
-                res.status(200).send(member.toJSON());
+                res.sendStatus(200);
             } catch (e) {
                 res.status(400).send(e);
             }
@@ -23,11 +23,11 @@ export default class Member extends Route {
                 const member_id = req.params.member_id;
                 const partial = req.body;
                 if (!partial || typeof partial !== 'object') throw { status: 400, message: 'Invalid Body' };
-                const member = await this.server.managers.member(guild_id, member_id).catch((e: any) => { throw e; });
-                await member.update(partial).catch((e: any) => { throw e; });
-                await member.fetch().catch((e: any) => { throw e; });
+                const member = await this.server.managers.member(guild_id, member_id);
+                await member.update(partial);
+                await member.fetch();
                 this.server.ws.local.emit('raw', 'memberUpdate', member.toJSON());
-                res.status(200).send(member.toJSON());
+                res.sendStatus(200);
             } catch (e) {
                 res.status(400).send(e);
             }
@@ -36,10 +36,10 @@ export default class Member extends Route {
             try {
                 const guild_id = req.params.guild_id;
                 const member_id = req.params.member_id;
-                const member = await this.server.managers.member(guild_id, member_id).catch((e: any) => { throw e; });
-                await member.destroy().catch((e: any) => { throw e });
+                const member = await this.server.managers.member(guild_id, member_id);
+                await member.destroy();
                 this.server.ws.local.emit('raw', 'memberDelete', { guild_id, member_id });
-                res.status(200).send({ status: 200, message: 'Member Deleted from the database!' });
+                res.sendStatus(200);
             } catch (e) {
                 res.status(400).send(e);
             }

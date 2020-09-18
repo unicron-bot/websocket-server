@@ -21,7 +21,7 @@ export default class Server extends EventEmitter {
         guild: (id: string) => Promise<Guild>;
         member: (guild_id: string, member_id: string) => Promise<GuildMember>;
     };
-    constructor() {
+    public constructor() {
         super();
         this.app = express();
         this.logger = Logger;
@@ -50,15 +50,16 @@ export default class Server extends EventEmitter {
             },
         };
     }
-    async registerRoutes() {
+    private async registerRoutes() {
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use((req, _res, next) => {
-            this.logger.info(`${req.ip.replace('::ffff:', '')} ${req.method} ${req.path}`, 'Client');
+            this.logger.info(`${req.method} ${req.path}`);
+            if (req.body && Object.keys(req.body).length) this.logger.info(req.body);
             next();
         });
         this.app.get('/', (_req, res) => {
-            res.status(200).json({ message: 'Hello World', status: 200 });
+            res.sendStatus(200);
         });
         const filePath = path.join(__dirname, '..', 'routes');
         const files = await fs.readdir(filePath);
@@ -66,29 +67,26 @@ export default class Server extends EventEmitter {
             if (file.endsWith('.js')) {
                 const route = require(path.join(filePath, file));
                 const instance = new route.default(this);
-                this.logger.info(`Route ${instance.path}`, 'Server');
+                this.logger.info(`Route ${instance.path}`);
                 this.app.use(instance.path, instance.createRoute());
             }
         }
         this.app.use((_req, res) => {
-            res.status(404).json({ message: 'Not found :P', status: 404 });
+            res.sendStatus(404);
         });
     }
-    websocketInit() {
+    private websocketInit() {
         this.http = http.createServer(this.app);
         this.ws = io(this.http);
         this.ws.on('connection', (socket) => {
-            this.logger.info(`[Client ${socket.id}] connected!`, 'Client');
+            this.logger.info(`[Client ${socket.id}] connected!`);
             socket.emit('raw', 'ready');
             socket.on('disconnect', () => {
-                this.logger.info(`[${socket.id}] disconnected`, 'Client');
-            });
-            socket.on('error', (err) => {
-                this.logger.error(err, 'Client');
+                this.logger.info(`[${socket.id}] disconnected`);
             });
         });
     }
-    async listen(port: number) {
+    public async listen(port: number) {
         this.websocketInit();
         await this.registerRoutes();
         this.http.listen(port, () => {
