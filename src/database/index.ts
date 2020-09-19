@@ -29,9 +29,6 @@ const GuildMember = g.member(db);
     });
 })();
 
-export default {
-    db,
-    models: {
-        User, Guild, GuildMember
-    }
+export {
+    User, Guild, GuildMember,
 }

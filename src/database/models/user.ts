@@ -12,31 +12,6 @@ export default function user(sequelize: Sequelize) {
             allowNull: false,
             defaultValue: {},
         },
-        inventory: {
-            type: DataTypes.JSON,
-            allowNull: false,
-            defaultValue: [],
-        },
-        balance: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-        },
-        experience: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-        }, 
-        multiplier: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-        },
-        marriage_id: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            defaultValue: '',
-        }
     }, {
         timestamps: false,
     });

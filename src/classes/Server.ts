@@ -5,59 +5,20 @@ import http from 'http';
 import io from 'socket.io';
 import Logger from '../utils/Logger';
 import express from 'express';
-import Database from '../database';
-import User from './User';
-import Guild from './Guild';
-import GuildMember from './Member';
 
 export default class Server extends EventEmitter {
     private http: http.Server;
     public app: express.Application;
     public logger: typeof Logger;
-    public db: typeof Database;
     public ws: io.Server;
-    public managers: {
-        user: (id: string) => Promise<User>;
-        guild: (id: string) => Promise<Guild>;
-        member: (guild_id: string, member_id: string) => Promise<GuildMember>;
-    };
     public constructor() {
         super();
         this.app = express();
         this.logger = Logger;
-        this.db = Database;
-        this.managers = {
-            user: (id: string): Promise<User> => {
-                return new Promise(async (resolve, reject) => {
-                    const user = new User(this, id);
-                    await user.fetch().catch(reject);
-                    resolve(user);
-                });
-            },
-            guild: (id: string): Promise<Guild> => {
-                return new Promise(async (resolve, reject) => {
-                    const guild = new Guild(this, id);
-                    await guild.fetch().catch(reject);
-                    resolve(guild);
-                });
-            },
-            member: (guild_id: string, member_id: string): Promise<GuildMember> => {
-                return new Promise(async (resolve, reject) => {
-                    const member = new GuildMember(this, { guild_id, member_id });
-                    await member.fetch().catch(reject);
-                    resolve(member);
-                });
-            },
-        };
     }
     private async registerRoutes() {
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
-        this.app.use((req, _res, next) => {
-            this.logger.info(`${req.method} ${req.path}`);
-            if (req.body && Object.keys(req.body).length) this.logger.info(req.body);
-            next();
-        });
         this.app.get('/', (_req, res) => {
             res.sendStatus(200);
         });

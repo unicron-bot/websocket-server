@@ -1,54 +1,50 @@
 import Route from '../classes/Route';
 import Server from '../classes/Server';
+import { Guild } from '../database';
 
-export default class Guild extends Route {
-    constructor(server: Server) {
-        super(server, '/api/guild');
+export default class GuildRoute extends Route {
+    public constructor(server: Server) {
+        super(server, '/api/guild')
     }
-    createRoute() {
+    public createRoute() {
         this.router.get('/:id', async (req, res) => {
             try {
                 const id = req.params.id;
-                if (!id)
-                    throw { status: 400, message: 'Parameter ID not provided' };
-                const guild = await this.server.managers.guild(id);
-                this.server.ws.local.emit('raw', 'guildUpdate', guild.toJSON());
-                res.sendStatus(200);
-            }
-            catch (e) {
-                res.status(400).send(e);
+                const guild = await Guild.findOne({ where: { id } });
+                if (!guild) return res.status(200).json({ id });
+                const payload = guild.toJSON();
+                this.server.ws.local.emit('raw', 'guild', payload);
+                res.status(200).json(payload);
+            } catch (e) {
+                this.server.logger.error(e);
+                res.status(500).json(e);
             }
         });
         this.router.post('/:id', async (req, res) => {
             try {
                 const id = req.params.id;
-                const partial = req.body;
-                if (!id)
-                    throw { status: 400, message: 'Missing Parameter' };
-                if (!partial || typeof partial !== 'object')
-                    throw { status: 400, message: 'Invalid Body' };
-                const guild = await this.server.managers.guild(id);
-                await guild.update(partial);
-                await guild.fetch();
-                this.server.ws.local.emit('raw', 'guildUpdate', guild.toJSON());
-                res.sendStatus(200);
-            }
-            catch (e) {
-                res.status(400).send(e);
+                const body = req.body;
+                let guild = await Guild.findOne({ where: { id } });
+                if (!guild) guild = await Guild.create({ id });
+                await Guild.update(body, { where: { id } });
+                const raw = await Guild.findOne({ where: { id } });
+                const payload = raw.toJSON();
+                this.server.ws.local.emit('raw', 'guild', payload);
+                res.status(200).json(payload);
+            } catch (e) {
+                this.server.logger.error(e);
+                res.status(500).json(e);
             }
         });
         this.router.delete('/:id', async (req, res) => {
             try {
                 const id = req.params.id;
-                if (!id)
-                    throw { status: 400, message: 'Missing Parameter' };
-                const guild = await this.server.managers.guild(id);
-                await guild.destroy();
+                await Guild.destroy({ where: { id } });
                 this.server.ws.local.emit('raw', 'guildDelete', id);
-                res.sendStatus(200);
-            }
-            catch (e) {
-                res.status(400).send(e);
+                res.status(200).json(id);
+            } catch (e) {
+                this.server.logger.error(e);
+                res.status(500).json(e);
             }
         });
         return this.router;
