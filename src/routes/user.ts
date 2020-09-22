@@ -13,7 +13,7 @@ export default class UserRoute extends Route {
                 const user = await User.findOne({ where: { id } });
                 if (!user) return res.status(200).json({ id });
                 const payload = user.toJSON();
-                this.server.ws.local.emit('raw', 'user', payload);
+                this.server.ws.local.emit('raw', { EVENT: 'USER', data: payload });
                 res.status(200).json(payload);
             } catch (e) {
                 this.server.logger.error(e);
@@ -29,7 +29,7 @@ export default class UserRoute extends Route {
                 await User.update(body, { where: { id } });
                 const raw = await User.findOne({ where: { id } });
                 const payload = raw.toJSON();
-                this.server.ws.local.emit('raw', 'user', payload);
+                this.server.ws.local.emit('raw', { EVENT: 'USER', data: payload });
                 res.status(200).json(payload);
             } catch (e) {
                 this.server.logger.error(e);
@@ -40,8 +40,8 @@ export default class UserRoute extends Route {
             try {
                 const id = req.params.id;
                 await User.destroy({ where: { id } });
-                this.server.ws.local.emit('raw', 'userDelete', id);
-                res.status(200).json(id);
+                this.server.ws.local.emit('raw', { EVENT: 'USER_DELETE', data: { id } });
+                res.status(200).json({ id });
             } catch (e) {
                 this.server.logger.error(e);
                 res.status(500).json(e);

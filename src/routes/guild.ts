@@ -13,7 +13,7 @@ export default class GuildRoute extends Route {
                 const guild = await Guild.findOne({ where: { id } });
                 if (!guild) return res.status(200).json({ id });
                 const payload = guild.toJSON();
-                this.server.ws.local.emit('raw', 'guild', payload);
+                this.server.ws.local.emit('raw', { EVENT: 'GUILD', data: payload });
                 res.status(200).json(payload);
             } catch (e) {
                 this.server.logger.error(e);
@@ -29,7 +29,7 @@ export default class GuildRoute extends Route {
                 await Guild.update(body, { where: { id } });
                 const raw = await Guild.findOne({ where: { id } });
                 const payload = raw.toJSON();
-                this.server.ws.local.emit('raw', 'guild', payload);
+                this.server.ws.local.emit('raw', { EVENT: 'GUILD', data: payload });
                 res.status(200).json(payload);
             } catch (e) {
                 this.server.logger.error(e);
@@ -40,8 +40,8 @@ export default class GuildRoute extends Route {
             try {
                 const id = req.params.id;
                 await Guild.destroy({ where: { id } });
-                this.server.ws.local.emit('raw', 'guildDelete', id);
-                res.status(200).json(id);
+                this.server.ws.local.emit('raw', { EVENT: 'GUILD_DELETE', data: { id } });
+                res.status(200).json({ id });
             } catch (e) {
                 this.server.logger.error(e);
                 res.status(500).json(e);

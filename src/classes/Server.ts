@@ -11,16 +11,26 @@ export default class Server extends EventEmitter {
     public app: express.Application;
     public logger: typeof Logger;
     public ws: io.Server;
+    private sessions: string[];
     public constructor() {
         super();
         this.app = express();
         this.logger = Logger;
+        this.sessions = [];
     }
     private async registerRoutes() {
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         this.app.get('/', (_req, res) => {
             res.sendStatus(200);
+        });
+        this.app.use((req, res, next) => {
+            const Authorization = req.headers.authorization;
+            if (Authorization && this.sessions.includes(Authorization)) return next();
+            res.status(403).json({
+                MESSAGE: 'FORBIDDEN ENTRY',
+                STATUS: 403,
+            });
         });
         const filePath = path.join(__dirname, '..', 'routes');
         const files = await fs.readdir(filePath);
@@ -40,10 +50,12 @@ export default class Server extends EventEmitter {
         this.http = http.createServer(this.app);
         this.ws = io(this.http);
         this.ws.on('connection', (socket) => {
-            this.logger.info(`[Client ${socket.id}] connected!`);
-            socket.emit('raw', 'ready');
+            this.logger.info(`[${socket.id}] connected!`);
+            this.sessions.push(socket.id);
+            socket.emit('raw', { EVENT: 'READY', data: { session: socket.id } });
             socket.on('disconnect', () => {
                 this.logger.info(`[${socket.id}] disconnected`);
+                this.sessions = this.sessions.filter(s => s !== socket.id);
             });
         });
     }

@@ -18,8 +18,8 @@ export default class GuildsRoute extends Route {
         });
         this.router.delete('/', async (req, res) => {
             try {
-                const amount = await Guild.destroy();
-                this.server.ws.local.emit('raw', 'guildsDelete');
+                const amount = await Guild.destroy({ where: {} });
+                this.server.ws.local.emit('raw', { EVENT: 'GUILDS_DELETE' });
                 res.status(200).json({ amount });
             } catch (e) {
                 this.server.logger.error(e);

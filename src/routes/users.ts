@@ -18,8 +18,8 @@ export default class UsersRoute extends Route {
         });
         this.router.delete('/', async (req, res) => {
             try {
-                const amount = await User.destroy();
-                this.server.ws.local.emit('raw', 'usersDelete');
+                const amount = await User.destroy({ where: {} });
+                this.server.ws.local.emit('raw', { EVENT: 'USERS_DELETE' });
                 res.status(200).json({ amount });
             } catch (e) {
                 this.server.logger.error(e);

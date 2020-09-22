@@ -26,7 +26,7 @@ export default class MemberRoute extends Route {
                 const guild = await GuildMember.findOne({ where: { guild_id } });
                 if (!guild) return res.status(200).json([]);
                 const payload = guild.getDataValue('data');
-                this.server.ws.local.emit('raw', 'members', guild_id, payload);
+                this.server.ws.local.emit('raw', { EVENT: 'MEMBERS', data: { guild_id, members: payload } });
                 res.status(200).json(payload);
             } catch (e) {
                 this.server.logger.error(e);
@@ -37,7 +37,7 @@ export default class MemberRoute extends Route {
             try {
                 const guild_id = req.params.guild_id;
                 await GuildMember.destroy({ where: { guild_id } });
-                this.server.ws.local.emit('raw', 'membersDelete', guild_id);
+                this.server.ws.local.emit('raw', { EVENT: 'MEMBERS_DELETE', data: { guild_id } });
                 res.status(200).json({ guild_id });
             } catch (e) {
                 this.server.logger.error(e);
@@ -54,7 +54,7 @@ export default class MemberRoute extends Route {
                 const member = data.find(m => m.member_id === member_id);
                 if (!member) return res.status(200).json({ guild_id, member_id });
                 const payload = { guild_id, ...member };
-                this.server.ws.local.emit('raw', 'member', payload);
+                this.server.ws.local.emit('raw', { EVENT: 'MEMBER', data: payload });
                 res.status(200).json(payload);
             } catch (e) {
                 this.server.logger.error(e);
@@ -74,7 +74,7 @@ export default class MemberRoute extends Route {
                 member = { member, ...body };
                 await GuildMember.update({ data: data.map(m => m.member_id === member.member_id ? member : m) }, { where: { guild_id } });
                 const payload = { guild_id, ...member };
-                this.server.ws.local.emit('raw', 'member', payload);
+                this.server.ws.local.emit('raw', { EVENT: 'MEMBER', data: payload });
                 res.status(200).json(payload);
             } catch (e) {
                 this.server.logger.error(e);
@@ -92,7 +92,7 @@ export default class MemberRoute extends Route {
                 const member = data.find(m => m.member_id === member_id);
                 if (!member) return res.status(200).json(payload);
                 await GuildMember.update({ data: data.filter(m => m.member_id !== member_id) }, { where: { guild_id } });
-                this.server.ws.local.emit('raw', 'memberDelete', payload);
+                this.server.ws.local.emit('raw', { EVENT: 'MEMBER_DELETE', data: payload });
                 res.status(200).json(payload);
             } catch (e) {
                 this.server.logger.error(e);
