@@ -23,7 +23,7 @@
     "express": "^4.17.1",
     "moment": "^2.27.0",
     "node-fetch": "^2.6.1",
-    "sequelize": "^6.3.4",
+    "sequelize": "^6.3.5",
     "socket.io": "^2.3.0",
     "sqlite3": "^5.0.0"
   },
