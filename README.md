@@ -62,7 +62,7 @@ Event Names:
 ```json
 {
     "id": "GUILD ID",
-    // ...
+    # ...
 }
 ```
 
@@ -72,7 +72,7 @@ Event Names:
 ```json
 {
     "guild_id": "GUILD_ID",
-    "members": [], // ARRAY OF MEMBERS
+    "members": [], # ARRAY OF MEMBERS
 }
 ```
 
@@ -88,7 +88,7 @@ Event Names:
 {
     "guild_id": "GUILD_ID",
     "member_id": "MEMBER_ID",
-    "warnings": [], // ARRAY OF WARNINGS,
+    "warnings": [], # ARRAY OF WARNINGS,
     "cases": 0,
 }
 ```
@@ -105,6 +105,6 @@ Event Names:
 ```json
 {
     "id": "USER_ID",
-    // ...
+    # ...
 }
 ```
