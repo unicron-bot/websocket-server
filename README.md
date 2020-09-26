@@ -5,6 +5,21 @@ See [LICENSE](LICENSE)
 
 # Documentation
 
+## Installation
+
+It requires Node v14 and above and typescript installed
+```sh
+npm -v # check if npm is installed
+npm install --global typescript # you dont have to do this if you already have it installed
+git clone https://github.com/oadpoaw/websocket-server.git
+cd websocket-server
+npm install # install dependencies
+npm run build # to compile typescript to javascript
+npm run dbInit # to initialize database
+npm run start # to start
+```
+
+
 ## Reference
 
 Base URL: `http://localhost:4201/`
